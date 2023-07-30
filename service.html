@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Restaurant Website</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;700&display=swap">
+    <style>
+        body, h1, h2, h3, p, ul, li {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Roboto Slab', sans-serif;
+        }
+
+        nav {
+            background-color: #333;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            padding: 10px;
+        }
+
+        nav ul {
+            list-style-type: none;
+            display: flex;
+        }
+
+        nav li {
+            margin: 0 15px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .content {
+            display: flex;
+            flex-direction: column; 
+            align-items: center;
+            padding: 20px;
+        }
+
+        .text-field {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .text-field h2 {
+            margin-right: 10px;
+            font-weight: 700;
+        }
+
+        .text-field input {
+            width: 400px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 15px;
+            font-size: 16px;
+            font-weight: 400;
+        }
+
+        .box-gallery {
+            display: flex;
+            justify-content: space-between;
+            width: 800px; 
+            margin-top: 30px;
+        }
+
+        .box {
+            width: 380px; 
+            height: 200px; 
+            border: 1px solid #ccc;
+            border-radius: 15px;
+            background-color: #f2f2f2;
+        }
+
+        .big-box {
+            width: 800px;
+            height: 300px;
+            border: 1px solid #ccc;
+            border-radius: 15px;
+            background-color: #f2f2f2;
+            margin-top: 30px;
+        }
+
+    </style>
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="#home">Home</a></li>
+            <li><a href="#service">Service</a></li>
+        </ul>
+    </nav>
+
+    <div class="content">
+        <div class="text-field" id="cuisineInput">
+            <h2>Type of Cuisine:</h2>
+            <input type="text" placeholder="Enter cuisine type">
+        </div>
+
+        <div class="text-field" id="locationInput">
+            <h2>Location:</h2>
+            <input type="text" placeholder="Enter location">
+        </div>
+
+        <div class="text-field" id="yearInput">
+            <h2>Time of Year:</h2>
+            <input type="text" placeholder="Enter time of year">
+        </div>
+
+        <div class="text-field" id="durationInput">
+            <h2>Duration:</h2>
+            <input type="text" placeholder="Enter make time">
+        </div>
+
+        <div class="text-field" id="ingredientsInput">
+            <h2>Ingredients:</h2>
+            <input type="text" placeholder="Enter your">
+        </div>
+
+        <div class="box-gallery">
+            <div class="box"></div>
+            <div class="box"></div>
+        </div>
+
+        <div class="big-box"></div>
+        <button id="submitButton" onclick="submitInput()">Submit</button>
+    </div>
+</body>
+
+<script>
+
+    async function submitInput() {
+        let cuisine = document.getElementById('cuisineInput').value;
+        let location = document.getElementById('locationInput').value;
+        let year = document.getElementById('yearInput').value;
+        let duration = document.getElementById('durationInput').value;
+        let ingredients = document.getElementById('ingredientsInput').value;
+        console.log("Cuisine:", cuisine);
+        console.log("Location:", location);
+        console.log("Year:", year);
+        console.log("Duration:", duration);
+        console.log("Ingredients:", ingredients);
+
+        const response = await getGptResponse(cuisine, location, year, duration, ingredients);
+        
+        console.log(response);
+    }
+
+    async function getGptResponse(cuisine, location, year, duration, ingredients) {
+        const user_message = [
+            { "role": "user", "content": `Give me no other text except a recipe for a restaurant located in ${location} with ingredients and instructions (in maximum 5 steps) that is part of the following cuisine: ${cuisine}. The time of the year is ${year}, and the longest time it should take to make the food should be within ${duration}. Remember to not give me any text other than the ingredients, recipe steps (in 5 steps or less) and make sure the recipe contains all of the following ingredients: ${ingredients}` },
+        ];
+
+        const headers = {
+            'Authorization': `Bearer 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`,
+            'Content-Type': 'application/json',
+        };
+
+        const api_endpoint = 'https://api.openai.com/v1/chat/completions';
+
+        const response_openai = await fetch(api_endpoint, {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify({ messages: user_message, model: "gpt-3.5-turbo" }),
+        });
+        const openai_json = await response_openai.json();
+        console.log(openai_json)
+        return openai_json.choices[0].message.content;
+    }
+</script>
+
+</html>
